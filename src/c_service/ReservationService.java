@@ -2,22 +2,24 @@ package c_service;
 
 import d_model.*;
 
-import javax.naming.spi.ResolveResult;
 import java.util.*;
 
 import static d_model.RoomType.*;
 
 public class ReservationService {
 
-    private static final Map<String, IRoom> roomData = new HashMap<>();
-    private static final List<Reservation> reservationData = new ArrayList<>();
+    private final Set<IRoom> roomData;
+    private final Map<String, ArrayList<Reservation>> reservationData;
     private static ReservationService instance = null;
-    private ReservationService(){};
+    private ReservationService(){
+        roomData = new HashSet<>();
+        reservationData = new HashMap<>();
+    };
     public static ReservationService getInstance(){
         if(instance == null){instance = new ReservationService();}
         return instance;
     }
-    public static void addRoom(String roomNumber, double roomPrice, String roomType){
+    public void addRoom(String roomNumber, double roomPrice, String roomType){
         RoomType selectedRoomType = null;
         switch (roomType) {
             case "1":
@@ -30,58 +32,77 @@ public class ReservationService {
                 selectedRoomType = SUITE;
                 break;
         }
-        if(!roomData.containsKey(roomNumber)) {
-            Room roomToAdd = new Room(roomNumber, roomPrice, selectedRoomType);
-            roomData.put(roomToAdd.getRoomNumber(), roomToAdd);
-        }
-    }
-    public static IRoom getARoom(String roomId){
-        return roomData.get(roomId);
-    }
 
-    public static boolean roomExists(String roomNumber){
-        if(roomData.get(roomNumber) != null){
-            return true;
-        }
-        return false;
-    }
+        Room roomToAdd = new Room(roomNumber, roomPrice, selectedRoomType);
 
-    public static void reserveARoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate){
-        Reservation myRes = new Reservation(customer, room, checkInDate, checkOutDate);
-        reservationData.add(myRes);
-    }
+        boolean doesRoomExistAlready = false;
 
-    public static Map<String, IRoom> findRooms(Date checkInDate, Date checkOutDate){
-        Map<String, IRoom> availableRooms = new HashMap<>(roomData);
-        Iterator<Reservation> iterator = reservationData.iterator();
-        while (iterator.hasNext()) {
-            Reservation activeResy = iterator.next();
-            if(activeResy.getCheckInDate().before(checkOutDate) && activeResy.getCheckOutDate().after(checkInDate) && activeResy.getRoom().equals(availableRooms.get(activeResy.getRoom().getRoomNumber()))){
-                availableRooms.remove(activeResy.getRoom().getRoomNumber());
+        Set<IRoom> tempRoomSet = new HashSet<>(roomData);
+        //loop through temp list to see if room is used already
+        for(IRoom roomSearch: tempRoomSet){
+            if(roomSearch.getRoomNumber().equals(roomToAdd.getRoomNumber())){
+                doesRoomExistAlready = true;
             }
         }
+
+        if(doesRoomExistAlready) {
+            System.out.println("Room exists, try again");
+        }else{
+            roomData.add(roomToAdd);
+        }
+    }
+    public IRoom getARoom(String roomId){
+        for(IRoom roomToFind: roomData){
+            if(roomToFind.getRoomNumber().equals(roomId)){
+                return roomToFind;
+            }
+        }
+        return null;
+    }
+
+    public void reserveARoom(Customer customer, IRoom room, Date checkIn, Date checkOut){
+        Reservation myNewReservation = new Reservation(customer, room, checkIn, checkOut);
+        ArrayList<Reservation> tempArray = new ArrayList<>();
+        reservationData.putIfAbsent(customer.getEmail(), tempArray);
+        reservationData.get(customer.getEmail()).add(myNewReservation);
+    }
+
+    public List<IRoom> findRooms(Date checkInDate, Date checkOutDate){
+        List<IRoom> availableRooms = new ArrayList<>(roomData);
+        reservationData.forEach((s,list) ->{
+            Iterator<Reservation> iterator = list.iterator();
+            while (iterator.hasNext()) {
+                Reservation activeResy = iterator.next();
+                if(
+                        activeResy.getCheckInDate().before(checkOutDate) &&
+                                activeResy.getCheckOutDate().after(checkInDate)
+
+                )
+                {
+                    availableRooms.remove(activeResy.getRoom().getRoomNumber());
+                }
+            }
+        });
+
         System.out.println(availableRooms);
-        return availableRooms;
+        return  availableRooms;
     }
 
-    public static Collection<Reservation> getCustomersReservation(Customer customer){
-        Collection<Reservation> matchedReservations = new ArrayList<>();
-        Iterator<Reservation> iterator = reservationData.iterator();
-        while (iterator.hasNext()) {
-            Reservation activeResy = iterator.next();
-            if(activeResy.getCustomer().getEmail() == customer.getEmail()){
-                matchedReservations.add(activeResy);
-            }
+    public Collection<Reservation> getCustomersReservation(Customer customer){
+        try{
+        return reservationData.get((customer.getEmail()));
+        }catch(NullPointerException ex){
+            System.out.println("no reservations found");
         }
-        return matchedReservations;
+    return null;
     }
 
-    public static List<Reservation> getAllReservations(){
-        return reservationData;
+    public void getAllReservations(){
+        System.out.println(reservationData);
 
     }
 
-    public static Collection<IRoom> getAllRooms(){
-        return roomData.values();
+    public  Collection<IRoom> getAllRooms(){
+        return roomData;
     }
 }

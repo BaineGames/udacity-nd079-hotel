@@ -52,8 +52,7 @@ public class AdminMenu {
                 generateAdminMenu();
                 break;
             case 3:
-                List<Reservation> allReservations = AdminResource.getAllReservations();
-                System.out.println(allReservations);
+                AdminResource.getAllReservations();
                 generateAdminMenu();
                 break;
             case 4:
@@ -79,13 +78,6 @@ public class AdminMenu {
             System.out.println("Room number must be a number");
         }
 
-        if(AdminResource.roomExists(roomNumber)){
-            System.out.println("Room exists already, try again");
-            addNewRoom();
-        }
-
-
-        //room is automatically overwritten by design if already in data pool
         System.out.println("Please enter room type:");
         System.out.println("1 ---- Single Bed Room");
         System.out.println("2 ---- Double Bed Room");

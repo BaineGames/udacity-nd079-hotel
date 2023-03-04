@@ -7,29 +7,27 @@ import d_model.IRoom;
 import d_model.Reservation;
 
 import java.util.Collection;
-import java.util.List;
 
 public class AdminResource {
-    public Customer getCustomer(String email){
-        return CustomerService.getInstance().getCustomer(email);
+
+    private static final CustomerService customer = CustomerService.getInstance();
+    private static final ReservationService reservation = ReservationService.getInstance();
+    public static Customer getCustomer(String email){
+        return customer.getCustomer(email);
     }
     public static void addRoom(String roomNumber, double roomPrice, String roomType){
-        ReservationService.getInstance().addRoom(roomNumber, roomPrice, roomType);
-    }
-
-    public static boolean roomExists(String roomNumber){
-        return ReservationService.getInstance().roomExists(roomNumber);
+        reservation.addRoom(roomNumber, roomPrice, roomType);
     }
 
     public static Collection<IRoom> getAllRooms(){
-        return ReservationService.getInstance().getAllRooms();
+        return reservation.getAllRooms();
     }
 
     public static Collection<Customer> getAllCustomers(){
-        return CustomerService.getInstance().getAllCustomers();
+        return customer.getAllCustomers();
     }
 
-    public static List<Reservation> getAllReservations(){
-        return ReservationService.getInstance().getAllReservations();
+    public static void getAllReservations(){
+        reservation.getAllReservations();
     }
 }

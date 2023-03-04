@@ -15,18 +15,18 @@ public class CustomerService {
         if(instance == null){instance = new CustomerService();}
         return instance;
     }
-    public static void addCustomer(String firstName, String lastName, String email){
+    public void addCustomer(String firstName, String lastName, String email){
         Customer customerToAdd = new Customer(firstName, lastName, email);
         if(customerToAdd.getEmail() != null){
             customersData.put(email, customerToAdd);
         }
     }
 
-    public static Customer getCustomer(String customerEmail){
+    public Customer getCustomer(String customerEmail){
         return customersData.get(customerEmail);
     }
 
-    public static Collection<Customer> getAllCustomers(){
+    public Collection<Customer> getAllCustomers(){
         return customersData.values();
     }
 

@@ -113,7 +113,7 @@ public class MainMenu {
             findAndReserveARoom();
         }
         //have the customer and dates, need to find the rooms
-        Map<String, IRoom> availableRooms = HotelResource.findARoom(checkin, checkout);
+        Collection<IRoom> availableRooms = HotelResource.findARoom(checkin, checkout);
         if (availableRooms.isEmpty()) {
             System.out.println("No available rooms currently. Trying additional dates.");
             availableRooms = searchEnhancedDateRange(checkin, checkout);
@@ -127,33 +127,31 @@ public class MainMenu {
         } else {
             System.out.println("Available rooms found as follows:");
         }
-        availableRooms.forEach((s, room) -> {
+        for(IRoom room: availableRooms){
             System.out.println(room.getRoomNumber() + " - " + room.getRoomType() + " - " + room.getRoomPrice());
-        });
+        }
 
         System.out.println("Please input what room number you would like to reserve:");
 
         String reserveRoomNumber = scanner.nextLine();
-
+        IRoom reserveRoom = HotelResource.getRoom(reserveRoomNumber);
         String finalUserEmail = userEmail;
         Date finalCheckin = checkin;
         Date finalCheckout = checkout;
-        availableRooms.forEach((s, room) -> {
+        for(IRoom room: availableRooms){
             if(Objects.equals(reserveRoomNumber, room.getRoomNumber())){
-                HotelResource.bookARoom(finalUserEmail,reserveRoomNumber, finalCheckin, finalCheckout);
+                HotelResource.bookARoom(finalUserEmail,reserveRoom, finalCheckin, finalCheckout);
                 System.out.println("Reservation confirmed!");
                 generateMainMenu();
             }
-        });
+        }
 
         System.out.println("Room not valid option, please try again");
         generateMainMenu();
 
-
-
     }
 
-    public static Map<String, IRoom> searchEnhancedDateRange(Date checkin, Date checkout){
+    public static Collection<IRoom> searchEnhancedDateRange(Date checkin, Date checkout){
         SimpleDateFormat dateParser = new SimpleDateFormat("MM-dd-yyyy");
         Calendar cal = Calendar.getInstance();
         cal.setTime(checkin);
@@ -175,10 +173,12 @@ public class MainMenu {
         System.out.println("What email do you need to see reservations for?");
         String userEmail = scanner.nextLine();
         Collection<Reservation> myReservations = HotelResource.getCustomersReservations(userEmail);
-        Iterator<Reservation> iterator = myReservations.iterator();
-        while (iterator.hasNext()) {
-            Reservation activeResy = iterator.next();
-            System.out.println(activeResy);
+        if(myReservations != null){
+            Iterator<Reservation> iterator = myReservations.iterator();
+            while (iterator.hasNext()) {
+                Reservation activeResy = iterator.next();
+                System.out.println(activeResy);
+            }
         }
 
         generateMainMenu();

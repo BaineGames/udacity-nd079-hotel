@@ -8,29 +8,32 @@ import d_model.Reservation;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 
 public class HotelResource {
+
+    private static final CustomerService customer = CustomerService.getInstance();
+    private static final ReservationService reservation = ReservationService.getInstance();
     public static Customer getCustomer(String email){
-        return CustomerService.getInstance().getCustomer(email);
+        return customer.getCustomer(email);
     }
     public static void createACustomer(String firstName, String lastName, String email){
-        CustomerService.getInstance().addCustomer(firstName, lastName, email);
+        customer.addCustomer(firstName, lastName, email);
     }
 
     public static IRoom getRoom(String roomNumber){
-        return ReservationService.getInstance().getARoom(roomNumber);
+        return reservation.getARoom(roomNumber);
     }
 
-    public static void bookARoom(String customerEmail, String roomNumber, Date checkInDate, Date checkOutDate){
-        ReservationService.getInstance().reserveARoom(CustomerService.getInstance().getCustomer(customerEmail),getRoom(roomNumber),checkInDate, checkOutDate);
+    public static void bookARoom(String customerEmail, IRoom room, Date checkInDate, Date checkOutDate){
+        reservation.reserveARoom(customer.getCustomer(customerEmail),room,checkInDate, checkOutDate);
     }
 
     public static Collection<Reservation> getCustomersReservations(String customerEmail){
-        return ReservationService.getInstance().getCustomersReservation(CustomerService.getInstance().getCustomer(customerEmail));
+
+        return reservation.getCustomersReservation(customer.getCustomer(customerEmail));
     }
 
-    public static Map<String, IRoom> findARoom(Date checkInDate, Date checkOutDate){
-        return ReservationService.getInstance().findRooms(checkInDate,checkOutDate);
+    public static Collection<IRoom> findARoom(Date checkInDate, Date checkOutDate){
+        return reservation.getInstance().findRooms(checkInDate,checkOutDate);
     }
 }
