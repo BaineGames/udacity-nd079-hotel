@@ -1,6 +1,7 @@
 package d_model;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class Reservation {
     Customer customer;
@@ -8,13 +9,36 @@ public class Reservation {
     Date checkInDate;
     Date checkOutDate;
 
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public IRoom getRoom() {
+        return room;
+    }
+
+    public Date getCheckInDate() {
+        return checkInDate;
+    }
+
+    public Date getCheckOutDate() {
+        return checkOutDate;
+    }
+
+    public Reservation(Customer customer, IRoom room, Date checkInDate, Date checkOutDate) {
+        this.customer = customer;
+        this.room = room;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+    }
+
     @Override
     public String toString() {
-        return "Reservation{" +
-                "customer=" + customer +
-                ", room=" + room +
-                ", checkInDate=" + checkInDate +
-                ", checkOutDate=" + checkOutDate +
-                '}';
+        return "" +
+                customer +
+                " reserved #" + room +
+                " for dates " + checkInDate +
+                " to " + checkOutDate;
     }
 }

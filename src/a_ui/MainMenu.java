@@ -1,7 +1,13 @@
 package a_ui;
 import b_api.HotelResource;
+import d_model.Customer;
+import d_model.IRoom;
+import d_model.Reservation;
 
-import java.util.Scanner;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import static java.lang.Integer.parseInt;
 
 public class MainMenu {
@@ -29,21 +35,26 @@ public class MainMenu {
         }
     }
 
-    public static void processUserInput(int userInput){
-        if(userInput == 1){
-            //findAndReserveARoom();
-        }
-        if(userInput == 2){
-            //seeMyReservations();
-        }
-        if(userInput == 3){
-            createMyAccount();
-        }
-        if(userInput == 4){
-            AdminMenu.generateAdminMenu();
-        }
-        if(userInput == 5){
-            System.out.println("Thank you for staying with us.");
+    public static void processUserInput(int userInput) {
+        switch(userInput){
+            case 1:
+                findAndReserveARoom();
+                break;
+            case 2:
+                seeMyReservations();
+                break;
+            case 3:
+                createMyAccount();
+                break;
+            case 4:
+                AdminMenu.generateAdminMenu();
+                break;
+            case 5:
+                System.out.println("Thank you for staying with us, come again soon");
+                break;
+            default:
+                generateMainMenu();
+                break;
         }
     }
 
@@ -51,16 +62,93 @@ public class MainMenu {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("First name?");
-        String firstName = scanner.next();
+        String firstName = scanner.nextLine();
         System.out.println("Last name?");
-        String lastName = scanner.next();
+        String lastName = scanner.nextLine();
         System.out.println("Email?");
-        String email = scanner.next();
+        String email = scanner.nextLine();
 
         HotelResource.createACustomer(firstName, lastName, email);
+        generateMainMenu();
+    }
+
+    public static void findAndReserveARoom() {
+        SimpleDateFormat checkDate = new SimpleDateFormat("mm-dd-yyyy");
+        Date checkin = null;
+        Date checkout = null;
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Do you have an existing account with us? y/n");
+        String hasAccount = scanner.nextLine();
+
+        String userEmail = null;
+        switch (hasAccount) {
+            case "y":
+                System.out.println("What is the email address the account is under?");
+                userEmail = scanner.nextLine();
+
+                Customer loggedInUser = HotelResource.getCustomer(userEmail);
+                if (loggedInUser == null) {
+                    System.out.println("Account not found, try again.");
+                    findAndReserveARoom();
+                }
+                System.out.println("Logged in as " + loggedInUser);
+                break;
+            case "n":
+                System.out.println("You must create an account first.");
+                generateMainMenu();
+                break;
+            default:
+                findAndReserveARoom();
+                break;
+        }
+
+        try {
+            System.out.println("What is your checkin date (mm-dd-yyyy)?");
+            checkin = checkDate.parse(scanner.nextLine());
+            System.out.println("What is your checkout date (mm-dd-yyyy)?");
+            checkout = checkDate.parse(scanner.nextLine());
+            if (checkout.before(checkin)) {
+                findAndReserveARoom();
+            }
+        } catch (ParseException e) {
+            System.out.println("Invalid input, lets try again");
+            findAndReserveARoom();
+        }
+        //have the customer and dates, need to find the rooms
+        Map<String, IRoom> availableRooms = HotelResource.findARoom(checkin, checkout);
+        if (availableRooms.isEmpty()) {
+            System.out.println("No available rooms currently.");
+        } else {
+            System.out.println("Available rooms found as follows:");
+        }
+        availableRooms.forEach((s, room) -> {
+            System.out.println(room.getRoomNumber() + " - " + room.getRoomType() + " - " + room.getRoomPrice());
+        });
+
+        System.out.println("Please input what room number you would like to reserve:");
+
+        String reserveRoomNumber = scanner.nextLine();
+
+        //todo - validate input
+        HotelResource.bookARoom(userEmail,reserveRoomNumber,checkin, checkout);
+
+        System.out.println("Reservation confirmed!");
 
         generateMainMenu();
+    }
 
+    public static void seeMyReservations(){
 
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("What email do you need to see reservations for?");
+        String userEmail = scanner.nextLine();
+        Collection<Reservation> myReservations = HotelResource.getCustomersReservations(userEmail);
+        Iterator<Reservation> iterator = myReservations.iterator();
+        while (iterator.hasNext()) {
+            Reservation activeResy = iterator.next();
+            System.out.println(activeResy);
+        }
     }
 }

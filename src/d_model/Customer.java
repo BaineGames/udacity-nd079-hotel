@@ -7,6 +7,10 @@ public class Customer {
     String lastName;
     String email;
 
+    public String getEmail() {
+        return email;
+    }
+
     public Customer(String firstName, String lastName, String email) {
         try {
             if (firstName == null || lastName == null || email == null) {
@@ -27,10 +31,6 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return firstName + " " + lastName + " (" + email + ")";
     }
 }
