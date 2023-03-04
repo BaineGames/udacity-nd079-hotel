@@ -1,9 +1,11 @@
 package a_ui;
 
 import b_api.AdminResource;
+import c_service.ReservationService;
 import d_model.*;
 
 import java.util.Collection;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -28,7 +30,7 @@ public class AdminMenu {
             }
             processAdminUserInput(userInput);
         }catch(NumberFormatException ex){
-            System.out.println("\nInput is not a number, valid input is 1-5");
+            System.out.println("\nInput is not a number");
             generateAdminMenu();
         }
     }
@@ -68,7 +70,21 @@ public class AdminMenu {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Please enter a room number:");
-        String roomNumber = scanner.nextLine();
+
+        String roomNumber = null;
+        try{
+            roomNumber = scanner.nextLine();
+            parseInt(roomNumber);
+        }catch(IllegalFormatException ex){
+            System.out.println("Room number must be a number");
+        }
+
+        if(AdminResource.roomExists(roomNumber)){
+            System.out.println("Room exists already, try again");
+            addNewRoom();
+        }
+
+
         //room is automatically overwritten by design if already in data pool
         System.out.println("Please enter room type:");
         System.out.println("1 ---- Single Bed Room");

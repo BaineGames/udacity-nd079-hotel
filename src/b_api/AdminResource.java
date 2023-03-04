@@ -17,6 +17,10 @@ public class AdminResource {
         ReservationService.getInstance().addRoom(roomNumber, roomPrice, roomType);
     }
 
+    public static boolean roomExists(String roomNumber){
+        return ReservationService.getInstance().roomExists(roomNumber);
+    }
+
     public static Collection<IRoom> getAllRooms(){
         return ReservationService.getInstance().getAllRooms();
     }

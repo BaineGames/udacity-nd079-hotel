@@ -30,11 +30,20 @@ public class ReservationService {
                 selectedRoomType = SUITE;
                 break;
         }
-        Room roomToAdd = new Room(roomNumber,roomPrice,selectedRoomType);
-        roomData.put(roomToAdd.getRoomNumber(),roomToAdd);
+        if(!roomData.containsKey(roomNumber)) {
+            Room roomToAdd = new Room(roomNumber, roomPrice, selectedRoomType);
+            roomData.put(roomToAdd.getRoomNumber(), roomToAdd);
+        }
     }
     public static IRoom getARoom(String roomId){
         return roomData.get(roomId);
+    }
+
+    public static boolean roomExists(String roomNumber){
+        if(roomData.get(roomNumber) != null){
+            return true;
+        }
+        return false;
     }
 
     public static void reserveARoom(Customer customer, IRoom room, Date checkInDate, Date checkOutDate){
