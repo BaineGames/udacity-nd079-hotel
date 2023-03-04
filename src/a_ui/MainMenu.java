@@ -70,7 +70,7 @@ public class MainMenu {
     }
 
     public static void findAndReserveARoom() {
-        SimpleDateFormat checkDate = new SimpleDateFormat("mm-dd-yyyy");
+        SimpleDateFormat checkDate = new SimpleDateFormat("MM-dd-yyyy");
         Date checkin = null;
         Date checkout = null;
         Scanner scanner = new Scanner(System.in);
@@ -115,7 +115,15 @@ public class MainMenu {
         //have the customer and dates, need to find the rooms
         Map<String, IRoom> availableRooms = HotelResource.findARoom(checkin, checkout);
         if (availableRooms.isEmpty()) {
-            System.out.println("No available rooms currently.");
+            System.out.println("No available rooms currently. Trying additional dates.");
+            availableRooms = searchEnhancedDateRange(checkin, checkout);
+
+            if(availableRooms.isEmpty()){
+                System.out.println("No rooms available for additional dates either, please try again.");
+                generateMainMenu();
+            }else{
+                System.out.println("Available rooms found as follows:");
+            }
         } else {
             System.out.println("Available rooms found as follows:");
         }
@@ -127,12 +135,37 @@ public class MainMenu {
 
         String reserveRoomNumber = scanner.nextLine();
 
-        //todo - validate input
-        HotelResource.bookARoom(userEmail,reserveRoomNumber,checkin, checkout);
+        String finalUserEmail = userEmail;
+        Date finalCheckin = checkin;
+        Date finalCheckout = checkout;
+        availableRooms.forEach((s, room) -> {
+            if(Objects.equals(reserveRoomNumber, room.getRoomNumber())){
+                HotelResource.bookARoom(finalUserEmail,reserveRoomNumber, finalCheckin, finalCheckout);
+                System.out.println("Reservation confirmed!");
+                generateMainMenu();
+            }
+        });
 
-        System.out.println("Reservation confirmed!");
-
+        System.out.println("Room not valid option, please try again");
         generateMainMenu();
+
+
+
+    }
+
+    public static Map<String, IRoom> searchEnhancedDateRange(Date checkin, Date checkout){
+        SimpleDateFormat dateParser = new SimpleDateFormat("MM-dd-yyyy");
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(checkin);
+        cal.add(Calendar.DATE, 7);
+        checkin = cal.getTime();
+
+        cal.setTime(checkout);
+        cal.add(Calendar.DATE, 7);
+        checkout = cal.getTime();
+        System.out.println(checkin);
+        System.out.println(checkout);
+        return HotelResource.findARoom(checkin, checkout);
     }
 
     public static void seeMyReservations(){
@@ -147,5 +180,7 @@ public class MainMenu {
             Reservation activeResy = iterator.next();
             System.out.println(activeResy);
         }
+
+        generateMainMenu();
     }
 }

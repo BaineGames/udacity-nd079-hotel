@@ -11,6 +11,12 @@ public class ReservationService {
 
     private static final Map<String, IRoom> roomData = new HashMap<>();
     private static final List<Reservation> reservationData = new ArrayList<>();
+    private static ReservationService instance = null;
+    private ReservationService(){};
+    public static ReservationService getInstance(){
+        if(instance == null){instance = new ReservationService();}
+        return instance;
+    }
     public static void addRoom(String roomNumber, double roomPrice, String roomType){
         RoomType selectedRoomType = null;
         switch (roomType) {
@@ -41,7 +47,7 @@ public class ReservationService {
         Iterator<Reservation> iterator = reservationData.iterator();
         while (iterator.hasNext()) {
             Reservation activeResy = iterator.next();
-            if(activeResy.getCheckInDate().before(checkOutDate) && activeResy.getCheckOutDate().after(checkInDate)){
+            if(activeResy.getCheckInDate().before(checkOutDate) && activeResy.getCheckOutDate().after(checkInDate) && activeResy.getRoom().equals(availableRooms.get(activeResy.getRoom().getRoomNumber()))){
                 availableRooms.remove(activeResy.getRoom().getRoomNumber());
             }
         }

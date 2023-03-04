@@ -12,25 +12,25 @@ import java.util.Map;
 
 public class HotelResource {
     public static Customer getCustomer(String email){
-        return CustomerService.getCustomer(email);
+        return CustomerService.getInstance().getCustomer(email);
     }
     public static void createACustomer(String firstName, String lastName, String email){
-        CustomerService.addCustomer(firstName, lastName, email);
+        CustomerService.getInstance().addCustomer(firstName, lastName, email);
     }
 
     public static IRoom getRoom(String roomNumber){
-        return ReservationService.getARoom(roomNumber);
+        return ReservationService.getInstance().getARoom(roomNumber);
     }
 
     public static void bookARoom(String customerEmail, String roomNumber, Date checkInDate, Date checkOutDate){
-        ReservationService.reserveARoom(CustomerService.getCustomer(customerEmail),getRoom(roomNumber),checkInDate, checkOutDate);
+        ReservationService.getInstance().reserveARoom(CustomerService.getInstance().getCustomer(customerEmail),getRoom(roomNumber),checkInDate, checkOutDate);
     }
 
     public static Collection<Reservation> getCustomersReservations(String customerEmail){
-        return ReservationService.getCustomersReservation(CustomerService.getCustomer(customerEmail));
+        return ReservationService.getInstance().getCustomersReservation(CustomerService.getInstance().getCustomer(customerEmail));
     }
 
     public static Map<String, IRoom> findARoom(Date checkInDate, Date checkOutDate){
-        return ReservationService.findRooms(checkInDate,checkOutDate);
+        return ReservationService.getInstance().findRooms(checkInDate,checkOutDate);
     }
 }
