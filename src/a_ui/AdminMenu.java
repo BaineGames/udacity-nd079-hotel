@@ -69,19 +69,39 @@ public class AdminMenu {
 
         System.out.println("Please enter a room number:");
         String roomNumber = scanner.nextLine();
-        //todo - check if room exists already
+        //room is automatically overwritten by design if already in data pool
         System.out.println("Please enter room type:");
         System.out.println("1 ---- Single Bed Room");
         System.out.println("2 ---- Double Bed Room");
         System.out.println("3 ---- Master Suite");
 
-        String roomType = scanner.nextLine();
+        String roomType = null;
+        try {
+            roomType = scanner.nextLine();
+            int numChecker = parseInt(roomType);
+            if (numChecker > 3 || numChecker < 1) {
+                throw new NumberFormatException("\nInvalid input, valid input is 1-3");
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("\nInput is not a number, valid input is 1-3");
+            generateAdminMenu();
+        }
 
         System.out.println("Please enter the nightly price in USD:");
-        Double roomPrice = scanner.nextDouble();
+
+        Double roomPrice = null;
+        try {
+            roomPrice = scanner.nextDouble();
+
+            if (roomPrice.isNaN()) {
+                throw new NumberFormatException("\nInvalid input detected, valid input is ##.##");
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("\nInvalid input detected, valid input is ##.##");
+            generateAdminMenu();
+        }
 
         AdminResource.addRoom(roomNumber, roomPrice, roomType);
-
         generateAdminMenu();
 
     }

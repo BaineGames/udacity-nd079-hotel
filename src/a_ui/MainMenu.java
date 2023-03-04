@@ -52,9 +52,6 @@ public class MainMenu {
             case 5:
                 System.out.println("Thank you for staying with us, come again soon");
                 break;
-            default:
-                generateMainMenu();
-                break;
         }
     }
 
