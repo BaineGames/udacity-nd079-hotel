@@ -3,9 +3,9 @@ package d_model;
 import java.util.regex.Pattern;
 
 public class Customer {
-    String firstName;
-    String lastName;
-    String email;
+    private String firstName;
+    private String lastName;
+    public String email;
 
     public String getEmail() {
         return email;

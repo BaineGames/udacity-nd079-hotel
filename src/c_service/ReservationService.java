@@ -69,22 +69,44 @@ public class ReservationService {
 
     public List<IRoom> findRooms(Date checkInDate, Date checkOutDate){
         List<IRoom> availableRooms = new ArrayList<>(roomData);
-        reservationData.forEach((s,list) ->{
+        reservationData.forEach((s,list) -> {
             Iterator<Reservation> iterator = list.iterator();
             while (iterator.hasNext()) {
                 Reservation activeResy = iterator.next();
-                if(
-                        activeResy.getCheckInDate().before(checkOutDate) &&
-                                activeResy.getCheckOutDate().after(checkInDate)
+                Date activeResyCheckIn = activeResy.getCheckInDate();
+                Date activeResyCheckOut = activeResy.getCheckOutDate();
 
-                )
-                {
-                    availableRooms.remove(activeResy.getRoom().getRoomNumber());
+                //boundary tests to remove room from list - probably overkill
+                if(activeResyCheckIn.after(checkInDate) && activeResyCheckIn.before(checkOutDate)){
+                    //this should mean the checkin for the room is
+                    // between my selected dates, which means its not available for use
+                    availableRooms.remove(activeResy.getRoom());
+                }
+                if(activeResyCheckOut.after(checkInDate) && activeResyCheckOut.before(checkOutDate)){
+                    //this should mean the checkout date for the room is
+                    //between my selected dates, which means its not available for use
+                    availableRooms.remove(activeResy.getRoom());
+                }
+                if(activeResyCheckIn.before(checkInDate) && activeResyCheckOut.after(checkOutDate)) {
+                    //this should mean the checkin and checkout for the existing reservation is
+                    // includes my selected dates, which means its not available for use
+                    availableRooms.remove(activeResy.getRoom());
+                }
+                if(activeResyCheckIn.equals(checkInDate) && activeResyCheckOut.equals(checkOutDate)){
+                    //this should mean the reservation matches my exact dates, so nope
+                    availableRooms.remove(activeResy.getRoom());
+                }
+                if(activeResyCheckIn.equals(checkInDate)){
+                    //if any reservation has the same checkin date - we know it shouldnt be available
+                    availableRooms.remove(activeResy.getRoom());
+                }
+                if(activeResyCheckOut.equals(checkOutDate)){
+                    //if any reservation has the same checkout date - we know it shouldnt be available
+                    availableRooms.remove(activeResy.getRoom());
                 }
             }
         });
 
-        System.out.println(availableRooms);
         return  availableRooms;
     }
 

@@ -3,8 +3,8 @@ package d_model;
 import java.util.Objects;
 
 public class Room implements IRoom{
-    String roomNumber;
-    Double price;
+    private String roomNumber;
+    private Double price;
     private RoomType roomType;
 
     public Room(String roomNumber, Double price, RoomType roomType) {
